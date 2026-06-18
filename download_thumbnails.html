@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Download Thumbnails</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #00ff00; }
+    button { background: #00ff00; color: #1a1a1a; padding: 10px 20px; margin: 5px; cursor: pointer; border: none; border-radius: 4px; }
+    button:hover { background: #00dd00; }
+    .log { background: #0a0a0a; padding: 10px; margin-top: 10px; border-left: 3px solid #00ff00; min-height: 100px; overflow-y: auto; max-height: 300px; }
+  </style>
+</head>
+<body>
+  <h1>🎬 Thumbnail Downloader</h1>
+  <p>This page will download all 5 captured thumbnails to your Downloads folder.</p>
+  
+  <button onclick="downloadAll()">📥 Download All 5 Thumbnails</button>
+  <button onclick="downloadClip(1)">Clip 1</button>
+  <button onclick="downloadClip(2)">Clip 2</button>
+  <button onclick="downloadClip(3)">Clip 3</button>
+  <button onclick="downloadClip(4)">Clip 4</button>
+  <button onclick="downloadClip(5)">Clip 5</button>
+  
+  <div class="log" id="log"></div>
+
+  <script>
+    function log(msg) {
+      const logDiv = document.getElementById('log');
+      logDiv.innerHTML += msg + '<br>';
+      logDiv.scrollTop = logDiv.scrollHeight;
+      console.log(msg);
+    }
+
+    function downloadClip(clipNum) {
+      const varName = 'capturedClip' + clipNum;
+      const dataUrl = window[varName];
+      
+      if (!dataUrl) {
+        log(`❌ Clip ${clipNum} not found in window`);
+        return;
+      }
+
+      try {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = `thumbnail_clip_${clipNum}.png`;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        log(`✅ Downloading clip ${clipNum}...`);
+      } catch (e) {
+        log(`❌ Error downloading clip ${clipNum}: ${e.message}`);
+      }
+    }
+
+    function downloadAll() {
+      log('Starting downloads...');
+      for (let i = 1; i <= 5; i++) {
+        setTimeout(() => downloadClip(i), i * 500);
+      }
+    }
+
+    // Auto-detect available clips
+    window.addEventListener('load', () => {
+      let available = 0;
+      for (let i = 1; i <= 5; i++) {
+        if (window['capturedClip' + i]) {
+          available++;
+          log(`✓ Clip ${i} available`);
+        }
+      }
+      log(`\n${available}/5 clips available`);
+    });
+  </script>
+</body>
+</html>
